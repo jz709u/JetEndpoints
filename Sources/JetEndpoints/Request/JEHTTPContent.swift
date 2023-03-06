@@ -7,9 +7,9 @@
 
 import Foundation
 #if os(iOS)
-    import UIKit
+import UIKit
 #elseif os(macOS)
-    import Cocoa
+import Cocoa
 #endif
 
 public struct JEHTTPContent {
