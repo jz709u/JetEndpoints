@@ -1,3 +1,4 @@
-# JWeb
+# JetEndpoints
 
-A description of this package.
+## A Simple Lightweight Network Library 
+
