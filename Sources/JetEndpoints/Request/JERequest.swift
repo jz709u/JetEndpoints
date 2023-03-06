@@ -1,12 +1,12 @@
 //
 //  JERequest.swift
-//  
+//
 //
 //  Created by Jay Zisch on 2023/02/22.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 public typealias JEQueryParam = (key: String, value: String)
 
@@ -15,7 +15,7 @@ public class JERequest {
     private var url: URL
     private var session: URLSession
     private var body: JEHTTPContent?
-    
+
     init(
         session: URLSession,
         url: URL,
@@ -27,7 +27,7 @@ public class JERequest {
         self.session = session
         self.body = body
     }
-    
+
     func with(queryParams: [JEQueryParam]) -> Self {
         var comps = URLComponents(string: url.absoluteString)
         let params = queryParams.map {
@@ -39,7 +39,7 @@ public class JERequest {
         }
         return self
     }
-    
+
     private func asRequest() -> URLRequest {
         var request = URLRequest(url: url)
         if let body = body {
@@ -49,16 +49,16 @@ public class JERequest {
         request.httpMethodValue = method
         return request
     }
-    
+
     func response<ResponseObject>(
-        _ type: ResponseObject.Type
+        _: ResponseObject.Type
     ) -> some JEResponseHandler where ResponseObject: Decodable {
         JEDefaultDecodableResponseHandler<ResponseObject>(
             session: session,
             urlRequest: asRequest()
         )
     }
-    
+
     func responseJSON() -> some JEJSONResponseHandler {
         JEDefaultJSONResponseHandler(
             session: session,

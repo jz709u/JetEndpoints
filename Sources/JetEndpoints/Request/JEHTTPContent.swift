@@ -1,15 +1,15 @@
 //
 //  JEHTTPContent.swift
-//  
+//
 //
 //  Created by Jay Zisch on 2023/02/21.
 //
 
 import Foundation
 #if os(iOS)
-import UIKit
+    import UIKit
 #elseif os(macOS)
-import Cocoa
+    import Cocoa
 #endif
 
 public struct JEHTTPContent {
@@ -19,26 +19,28 @@ public struct JEHTTPContent {
 
     let type: JEHTTPMIMEType
     let body: Data
-    
+
     init(type: JEHTTPMIMEType,
-         body: Data) {
+         body: Data)
+    {
         self.type = type
         self.body = body
     }
-    
+
     init?(json: [String: AnyObject]) {
         guard let data = try? JSONSerialization
             .data(withJSONObject: json) else { return nil }
-        self.type = .json
-        self.body = data
+        type = .json
+        body = data
     }
+
     init?(object: Codable) {
         guard let data = try? JSONEncoder()
             .encode(object) else { return nil }
-        self.type = .json
-        self.body = data
+        type = .json
+        body = data
     }
-    
+
     init?(image: UIImage, imageType: ImageTypes) {
         switch imageType {
         case .jpg:
@@ -55,12 +57,11 @@ public struct JEHTTPContent {
             body = pngData
         }
     }
-    
+
     /// [reference](https://www.donnywals.com/uploading-images-and-forms-to-a-server-using-urlsession/)
     ///
     /// [Content-Transfer-Encoding]https://www.w3.org/Protocols/rfc1341/5_Content-Transfer-Encoding.html
     init?(multipartFormData: [String: Any]) {
-        
         let boundary: String = UUID().uuidString
         let httpBody = NSMutableData()
         let newLine = "\r\n"
@@ -76,7 +77,7 @@ public struct JEHTTPContent {
             fieldString += "\(value)\(newLine)"
             return fieldString.data(using: .utf8)
         }
-        
+
         func dataFormField(
             named name: String,
             data: JEHTTPContent
@@ -92,16 +93,17 @@ public struct JEHTTPContent {
 
             return fieldData as Data
         }
-        
+
         for (name, value) in multipartFormData {
             if let data = value as? JEHTTPContent {
                 httpBody.append(dataFormField(named: name, data: data))
             } else if let text = value as? String,
-                      let asData = textFormField(named: name, value: text){
+                      let asData = textFormField(named: name, value: text)
+            {
                 httpBody.append(asData)
             }
         }
-        
+
         httpBody.append("--\(boundary)--")
         type = .multiFormData(with: boundary)
         body = httpBody as Data
@@ -114,5 +116,3 @@ private extension NSMutableData {
         append(data)
     }
 }
-
-

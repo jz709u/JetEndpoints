@@ -1,6 +1,6 @@
 //
 //  FileExtensions.swift
-//  
+//
 //
 //  Created by Jay Zisch on 2023/02/22.
 //
@@ -13,4 +13,3 @@ public enum JEFileExtensions {
     case gif
     case unknown(String)
 }
-
