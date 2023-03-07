@@ -11,6 +11,7 @@ import Foundation
 public typealias JEQueryParam = (key: String, value: String)
 
 public class JERequest {
+    
     private var method: JEHTTPMethod
     private var url: URL
     private var session: URLSession
@@ -29,12 +30,18 @@ public class JERequest {
     }
 
     func with(queryParams: [JEQueryParam]) -> Self {
-        var comps = URLComponents(string: url.absoluteString)
+        guard var comps = URLComponents(string: url.absoluteString) else {
+            return self
+        }
         let params = queryParams.map {
             URLQueryItem(name: $0.key, value: $0.value)
         }
-        comps?.queryItems = params
-        if let url = comps?.url {
+        if let currentParams = comps.queryItems {
+            comps.queryItems = currentParams + params
+        } else {
+            comps.queryItems = params
+        }
+        if let url = comps.url {
             self.url = url
         }
         return self

@@ -4,60 +4,46 @@ import Nimble
 import Quick
 import XCTest
 
-class TestServer: JEServer {
-    var host: String? { "127.0.0.1" }
-    var port: Int? { 5000 }
-//    var session: URLSession {
-//        let configuration = URLSessionConfiguration.ephemeral
-//        configuration.protocolClasses = [MockRequestJSONResponse.self]
-//        return URLSession(configuration: configuration)
-//    }
-    enum Endpoints: String, JEServerPaths {
-        case fun
-    }
-}
-
-// class MockRequestJSONResponse: URLProtocol {
-//
-//    static var json: JSON?
-//
-//  override class func canInit(with request: URLRequest) -> Bool {
-//    // To check if this protocol can handle the given request.
-//    return true
-//  }
-//
-//  override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-//    // Here you return the canonical version of the request but most of the time you pass the orignal one.
-//    return request
-//  }
-//
-//  override func startLoading() {
-//      request.
-//      guard let url = request.url {
-//                  let path: String
-//                  if let queryString = url.query {
-//                      path = url.relativePath + "?" + queryString
-//                  } else {
-//                      path = url.relativePath
-//                  }
-//                  let data = MockURLProtocol.mockData[path]!
-//                  client?.urlProtocol(self, didLoad: data)
-//                  client?.urlProtocol(self, didReceive: HTTPURLResponse(), cacheStoragePolicy: .allowed)
-//              }
-//              client?.urlProtocolDidFinishLoading(self)
-//  }
-//
-//  override func stopLoading() {
-//    // This is called if the request gets canceled or completed.
-//  }
-// }
-
 final class JetEndpointsTests: XCTestCase {
+    
+    class TestServer: JEServer {
+        var host: String? { "127.0.0.1" }
+        var port: Int? { 5000 }
+        
+        enum Endpoints: String, JEServerPaths {
+            case fun
+        }
+    }
+
     func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        // XCTAssertEqual(JWeb().text, "Hello, World!")
+        let image = try loadImage(named: "jpeg-home")
+        var bag = Set<AnyCancellable>()
+
+        let expecation = expectation(description: "some")
+        expecation.assertForOverFulfill = false
+        
+        let server: JEServerType<TestServer.Endpoints> = "https://127.0.0.1:5000"
+
+        try server
+            .p(.fun)
+            .post(body: .init(image: image, imageType: .jpg)!)
+            .responseJSON()
+            .asFuture()
+            .sink(receiveCompletion: { error in
+                switch error {
+                case .finished:
+                    print("finished")
+                case let .failure(error):
+                    print("error \(error)")
+                }
+                expecation.fulfill()
+            }, receiveValue: { response in
+                print("response: \(response)")
+                expecation.fulfill()
+            })
+            .store(in: &bag)
+
+        wait(for: [expecation], timeout: 10)
     }
 
     func testImagePost() throws {
@@ -68,8 +54,12 @@ final class JetEndpointsTests: XCTestCase {
         expecation.assertForOverFulfill = false
 
         let server = TestServer()
-        server
-            .p(.fun)
+        try server
+            .pMock(.fun, json: """
+            {
+            "hello" : "world"
+            }
+            """)
             .post(body: .init(image: imageData, imageType: .jpg)!)
             .responseJSON()
             .asFuture()

@@ -7,6 +7,6 @@
 
 import Foundation
 
-public enum JEServerSchema: String {
+public enum JEServerScheme: String {
     case http, https, ftp, mailto, tel, sms
 }

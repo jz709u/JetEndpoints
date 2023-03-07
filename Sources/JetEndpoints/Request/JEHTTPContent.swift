@@ -40,6 +40,11 @@ public struct JEHTTPContent {
         type = .json
         body = data
     }
+    
+    init?(data: Data) {
+        body = data
+        type = data.mimeType
+    }
 
     init?(image: UIImage, imageType: ImageTypes) {
         switch imageType {

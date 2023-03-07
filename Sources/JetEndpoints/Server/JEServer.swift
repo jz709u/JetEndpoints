@@ -12,9 +12,9 @@ public protocol JEServer {
     var session: URLSession { get }
     var baseURL: String { get }
 
-    // MARK: schema
+    // MARK: scheme
 
-    var schema: JEServerSchema { get }
+    var scheme: JEServerScheme { get }
 
     // MARK: authority
 
@@ -23,16 +23,17 @@ public protocol JEServer {
     var host: String? { get }
     var port: Int? { get }
 
-    func p(_ endpoint: Endpoints) -> JESetMethod
+    func p(_ endpoint: Endpoints) throws -> JESetMethod
+    func pMock(_ endpoint: Endpoints, json: String) throws -> JESetMethod
 }
 
 public extension JEServer {
     var session: URLSession { .shared }
-    var baseURL: String { "\(schema.rawValue):\(authority)" }
+    var baseURL: String { "\(scheme.rawValue):\(authority)" }
 
-    // MARK: schema
+    // MARK: scheme
 
-    var schema: JEServerSchema { .http }
+    var scheme: JEServerScheme { .http }
 
     // MARK: authority
 
@@ -43,10 +44,23 @@ public extension JEServer {
     var port: Int? { nil }
     var portPart: String { port != nil ? ":\(port!)" : "" }
 
-    func p(_ endpoint: Endpoints) -> JESetMethod {
+    func p(_ endpoint: Endpoints) throws -> JESetMethod {
+        let path = try endpoint.asPath()
         return JESetMethod(
             session: session,
-            url: .init(string: baseURL + "/" + endpoint.asPath)!
+            url: .init(string: baseURL + "/" + path)!
+        )
+    }
+    
+    func pMock(_ endpoint: Endpoints, json: String) throws -> JESetMethod {
+        let path = try endpoint.asPath()
+        let config = session.configuration
+        config.protocolClasses = [JEMockRequestJSONResponse.self]
+        JEMockRequestJSONResponse.json = json
+        return JESetMethod(
+            session: URLSession(configuration: config),
+            url: .init(string: baseURL + "/" + path)!
         )
     }
 }
+

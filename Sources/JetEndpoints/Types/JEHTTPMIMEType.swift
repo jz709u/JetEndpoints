@@ -8,7 +8,7 @@
 import Foundation
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
-public struct JEHTTPMIMEType: RawRepresentable, ExpressibleByStringLiteral {
+public struct JEHTTPMIMEType: RawRepresentable, ExpressibleByStringLiteral, Equatable {
     // MARK: - ExpressibleByStringLiteral
 
     public typealias StringLiteralType = String
@@ -46,6 +46,7 @@ public struct JEHTTPMIMEType: RawRepresentable, ExpressibleByStringLiteral {
     public var subType: String = "" // subtypes: https://www.iana.org/assignments/media-types/media-types.xhtml#video
     public var unknownType: String?
     public var parameter: [String: String] = [:]
+    public var fileExt: JEFileExtensions { JEFileExtensions(mimetype: self) }
 
     public init(stringLiteral value: String) {
         self.init(rawValue: value)

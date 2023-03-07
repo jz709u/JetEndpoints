@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  URLRequest+JEHTTPMIMEType.swift
 //
 //
 //  Created by Jay Zisch on 2023/02/22.

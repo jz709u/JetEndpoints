@@ -7,13 +7,38 @@
 
 import Foundation
 
-public protocol JEServerPaths: RawRepresentable where RawValue == String {
-    var asPath: String { get }
+public enum JEServerPathsErrors: Error {
+    case invalidPath
 }
 
-/// jay_other_one$x_1@y_2@z_4,
+public protocol JEServerPaths: RawRepresentable where RawValue == String {
+    func asPath() throws -> String
+}
+
+/// this: jay_other_one__x_1__y_2__z_4,
+///
+/// is equivalent to:
+///
+/// jay/other/one?x=1&y=2&z=4
 public extension JEServerPaths {
-    var asPath: String {
-        rawValue.replacingOccurrences(of: "_", with: "/")
+    func asPath() throws -> String {
+        let trimmedValue = rawValue.trimmingCharacters(in: CharacterSet(arrayLiteral: "_"))
+        let comps = trimmedValue.components(separatedBy: "__")
+        if comps.count <= 1 {
+            return trimmedValue.replacingOccurrences(of: "_", with: "/")
+        } else {
+            let path = comps[0].replacingOccurrences(of: "_", with: "/")
+            
+            var queryParams = "?"
+            let params = Array(comps.dropFirst())
+
+            for i in 0..<params.count {
+                queryParams += params[i].replacingOccurrences(of: "_", with: "=")
+                if i != params.count - 1 {
+                    queryParams += "&"
+                }
+            }
+            return path + queryParams
+        }
     }
 }

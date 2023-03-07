@@ -9,6 +9,8 @@ import Foundation
 
 extension JEHTTPMIMEType {
     static let json: JEHTTPMIMEType = "application/json"
+    static let octet: JEHTTPMIMEType = "application/octet-stream"
+    static let pdf: JEHTTPMIMEType = "application/pdf"
     static let jpeg: JEHTTPMIMEType = "image/jpeg"
     static let png: JEHTTPMIMEType = "image/png"
     static let csv: JEHTTPMIMEType = "text/csv"
