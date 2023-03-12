@@ -11,7 +11,7 @@ public class JESetMethod {
     private let session: URLSession
     private let url: URL
 
-    init(session: URLSession,
+    public init(session: URLSession,
          url: URL)
     {
         self.session = session

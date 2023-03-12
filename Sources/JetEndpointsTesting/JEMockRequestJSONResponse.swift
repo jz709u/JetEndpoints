@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if canImport(JetEndpoints)
 
 class JEMockRequestJSONResponse: URLProtocol {
     
@@ -13,7 +14,12 @@ class JEMockRequestJSONResponse: URLProtocol {
         case mockUnavailable
     }
     
-    static var json: String?
+    static var json: String? {
+        didSet {
+            Self.data = Self.json?.data(using: .utf8)
+        }
+    }
+    static var data: Data?
     
     override class func canInit(with request: URLRequest) -> Bool {
         return true
@@ -24,7 +30,7 @@ class JEMockRequestJSONResponse: URLProtocol {
     }
     
     override func startLoading() {
-        if let data = Self.json?.data(using: .utf8) {
+        if let data = Self.data {
             client?.urlProtocol(self, didLoad: data)
         } else {
             client?.urlProtocol(self, didFailWithError: Errors.mockUnavailable)
@@ -37,3 +43,4 @@ class JEMockRequestJSONResponse: URLProtocol {
         Self.json = nil
     }
 }
+#endif

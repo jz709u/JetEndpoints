@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class JEServerType<Endpoints: JEServerPaths>: JEServer, ExpressibleByStringLiteral, RawRepresentable {
+open class JEServerType<Endpoints: JEServerPaths>: JEServer, ExpressibleByStringLiteral, RawRepresentable {
     
     public var rawValue: String
     public typealias RawValue = String
@@ -30,7 +30,7 @@ public class JEServerType<Endpoints: JEServerPaths>: JEServer, ExpressibleByStri
         self._userInfo = comps.user
     }
     
-    public var session: URLSession { .shared }
+    open var session: URLSession { .shared }
     public var baseURL: String { "\(scheme.rawValue):\(authority)" }
 
     // MARK: scheme

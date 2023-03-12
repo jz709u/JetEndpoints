@@ -13,7 +13,8 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "JetEndpoints",
-            targets: ["JetEndpoints"])
+            targets: ["JetEndpoints"]),
+        .library(name:"JetEndpointsTesting", targets: ["JetEndpointsTesting"])
         
     ],
     dependencies: [
@@ -24,13 +25,15 @@ let package = Package(
         // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
+        .target(name: "JetEndpointsTesting", dependencies: []),
         .target(name: "JetEndpoints", dependencies: []),
         .testTarget(
             name: "JetEndpointsTests",
             dependencies: [
                 "Quick",
                 "Nimble",
-                "JetEndpoints"
+                "JetEndpoints",
+                "JetEndpointsTesting"
             ],
             resources: [
                 .process("Fixtures")

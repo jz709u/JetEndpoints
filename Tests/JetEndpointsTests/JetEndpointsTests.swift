@@ -1,5 +1,6 @@
 import Combine
 @testable import JetEndpoints
+import JetEndpointsTesting
 import Nimble
 import Quick
 import XCTest
@@ -16,7 +17,21 @@ final class JetEndpointsTests: XCTestCase {
     }
 
     func testExample() throws {
+        
         let image = try loadImage(named: "jpeg-home")
+        
+        struct Mock: JEMockEndpoints {
+            static var endpointToMock: [JetEndpointsTests.TestServer.Endpoints : (Data?, URLResponse?, Error?)] {
+                [
+                    .fun: (Data(),
+                           HTTPURLResponse(url: URL(string: "")!, statusCode: 100, httpVersion: nil, headerFields: nil)!,
+                          nil)
+                ]
+            }
+        }
+        
+        let serv: JEMockServerType<TestServer.Endpoints, Mock> = "https://127.0.0.1:5000"
+        
         var bag = Set<AnyCancellable>()
 
         let expecation = expectation(description: "some")
@@ -76,6 +91,7 @@ final class JetEndpointsTests: XCTestCase {
                 expecation.fulfill()
             })
             .store(in: &bag)
+        
 
         wait(for: [expecation], timeout: 10)
     }
